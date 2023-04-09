@@ -1,0 +1,41 @@
+<div id="wgtcolors" class="rs-dropdown rs-dropdown-placement-bottom-start" role="menu" style="width: 100%;">
+  <ul class="rs-dropdown-menu" role="menu" style="width: 100%; display: none; margin-top: 36px;">
+    <li class="rs-dropdown-item" onclick="_wgtcolors.set('red')"><a class="rs-dropdown-item-content">red</a></li>
+    <li class="rs-dropdown-item" onclick="_wgtcolors.set('blue')"><a class="rs-dropdown-item-content">blue</a>
+    </li>
+    <li class="rs-dropdown-item" onclick="_wgtcolors.set('yellow')"><a class="rs-dropdown-item-content">yellow</a></li>
+    <li class="rs-dropdown-item" onclick="_wgtcolors.set('green')"><a class="rs-dropdown-item-content">green</a></li>
+  </ul>
+  <a tabindex="0" class="rs-btn rs-btn-subtle rs-dropdown-toggle" onclick="_wgtcolors.open()"
+    style="width: 100%;">...</a>
+</div>
+
+<script defer>
+  var wgt = document.getElementById("wgtcolors")
+  var wgt_id = wgt.parentNode.id
+
+  var menu = wgt.querySelector("ul")
+  var value = wgt.querySelector("a.rs-dropdown-toggle")
+
+
+  var _wgtcolors = {
+    open: () => {
+      menu.style.display = menu.style.display == "none" ? "block" : "none"
+    },
+
+    set: (color) => {
+      value.innerHTML = color
+      RTMIP.setWidget(wgt_id, { color: color }).then(console.log).catch(console.error)
+      menu.style.display = "none"
+    },
+
+    load: () => {
+      RTMIP.dashboard().then((dashboard) => {
+        const w = dashboard.widgets.find((wgt) => wgt.id == wgt_id)
+        value.innerHTML = w.handlerData.color[0]
+      })
+    }
+  }
+
+  _wgtcolors.load()
+</script>
