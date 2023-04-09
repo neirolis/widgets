@@ -13,6 +13,40 @@ Text, non executable, widgets, like `html`, `markdown` or `template`, they are r
 
 It is important to keep in mind that you cannot use `const` and `let` in javascript code to declare variables, this causes errors when redrawing the page by **React**. All variables must be declared via `var`.
 
+## Widgets functions
+
+From the context of widgets, as well as custom pages, some global functions and objects are available.
+
+### Popup:
+
+`alert(string|Error)` - display alert message as popup alert instead browser window.
+
+`success(string|undefined)` - display popup success message.
+
+### Localization:
+
+`i18n.lang() -> string` - returns current language.
+
+`i18n.t(key:string) -> string` - translate some key by translate dictionary, ie: `i18n.t('apply')` - will be displayed as "Apply"/"Aplicar"/"Применить" according current language.
+
+`i18n.exists(key:string) -> boolean` - returns true if this localization key exists in the translate dictionary.
+
+### RTMIP API access:
+
+Widgets has access to the `RTMIP` object provide client to the backend API, it does not require additional authorization or anything else. All functions correspond to the API described in swagger. You can see the full list of available functions using console messages: `console.log(RTMIP)`
+
+`RTMIP.url(path:string) -> string` - returns the URL, up to the RTMIP backend, in most cases it prepend "/" to the start of path, but if the frontend is hosted by other services, for example nginx, then this function will add the ip address, and port if it differs from the defaults.
+
+`RTMIP.urlauth(path:string) -> string` - same as `RTMIP.url(path)` but substitute `jwt` token to the query variables.
+
+`RTMIP.GET(path:string, data?:any)` - GET request by specified path to the `/api`, for exampke: `RTMIP.GET("/user")` - returns current user, do not required to prepand `/api`.
+
+`RTMIP.POST(path:string, data?:any)` - POST request
+
+`RTMIP.DELETE(path:string)` - DELETE request
+
+`RTMIP.FILE(path:string, name:string, file:Blob, filename?:string)` - upload file to the backend
+
 ## Examples
 
 ### Time
