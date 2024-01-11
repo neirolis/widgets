@@ -1,0 +1,85 @@
+<div
+  id="widget_total"
+  class="rs-theme-dark"
+  role="widget"
+  style="width: 100%;"
+></div>
+
+
+<script defer>
+    function widget_total() {
+
+        var groups_to_check = [0,1,2,3,4,5,6,7,8,9,10]
+        var wgt = document.getElementById('widget_total');
+        var phrase = "Total inside: "
+
+        var now = new Date();
+        var startOfDay = new Date(now - (now % 86400000));
+
+        var now_time = Math.round(now.getTime() / 1000);
+        var startOfDay_time = Math.round(startOfDay.getTime() / 1000);
+
+        
+        function processItem(item) {
+            
+            return RTMIP.POST('/reports/events', {"profiles": [item[0]], "analytics": [9], "time_at": item[1], "time_to":now_time, "limit": 1000})
+            .catch((err)=>{
+                console.error(err)
+            })
+        }
+
+        async function processItems(ids_to_check) {
+            var result = 0
+            for (const id_time of ids_to_check) {
+                const prof_events = await processItem(id_time);
+                if (!prof_events["events"]) {
+                    result++;
+                }
+            }
+
+            return result
+        }
+
+
+        var inside_now = 0;
+        wgt.innerHTML = phrase + inside_now;
+
+        var ids_to_check = []
+        var filter = { "analytics": [4], "time_at": startOfDay_time, "time_to": now_time,
+                        "groups": groups_to_check, "limit": 1000 
+        }
+
+        RTMIP.POST('reports/events', filter)
+        .then((events_map)=>{ 
+            if (!events_map["events"]) {
+                return
+            }
+            var events = events_map.events
+
+            for (var i in events) {
+                var event = events[i];
+                for (var j in event.items) {
+                    var item = event.items[j];
+                    if (item.profile) {
+                        ids_to_check.push([item.profile.id, event.time_at])
+                    }
+                }
+            }
+
+        })
+        .then(() =>{
+            processItems(ids_to_check).then((result) => {
+                inside_now = result;
+                var path = window.location.pathname;
+                var page = path.split("/").pop();
+                console.log(wgt.id + " " + page)
+                wgt.innerHTML = phrase + inside_now;
+            });
+            
+        })
+        .catch((err)=>{
+            console.error(err)
+        })
+    }
+    widget_total();
+</script>
